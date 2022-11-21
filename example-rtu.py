@@ -37,10 +37,26 @@ if __name__ == "__main__":
         unit=args.unit
     )
 
+    if meter.connected():
+        print("Modbus Detected!")
+
     if args.json:
+        print(f"{meter}:")
+        print("\Fetching data from meter:")
+
+        for k, v in meter.read_all(sdm_modbus.registerType.INPUT).items():
+            address, length, rtype, dtype, vtype, label, fmt, batch, sf = meter.registers[k]
+
+            if type(fmt) is list or type(fmt) is dict:
+                print(f"\t{label}: {fmt[str(v)]}")
+            elif vtype is float:
+                print(f"\t{label}: {v:.2f}{fmt}")
+            else:
+                print(f"\t{label}: {v}{fmt}")
+
+        print("\nSending data to server...")
         meter_data = json.dumps(meter.read_all(scaling=True), indent=4)
-        print(meter_data)
-        requests.post(url='http://192.168.254.190:3333/save-details',
+        requests.post(url='http://localhost:3333/save-details',
                       params={"name": 'Room 1', "model": 'SDM120CT', "data": meter_data})
 
     else:
