@@ -3,17 +3,29 @@
 import argparse
 import json
 import sdm_modbus
+import requests
 
+
+# device = sdm_modbus.SDM120(
+#     device="/dev/cu.usbserial-11220", stopbits=1, parity="N", baud=9600, timeout=1, unit=1)
+
+# if device.connected():
+#     print("Working")
+# else:
+#     print("NOT Working")
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
     argparser.add_argument("device", type=str, help="Modbus device")
     argparser.add_argument("--stopbits", type=int, default=1, help="Stop bits")
-    argparser.add_argument("--parity", type=str, default="N", choices=["N", "E", "O"], help="Parity")
+    argparser.add_argument("--parity", type=str, default="N",
+                           choices=["N", "E", "O"], help="Parity")
     argparser.add_argument("--baud", type=int, default=2400, help="Baud rate")
-    argparser.add_argument("--timeout", type=int, default=1, help="Connection timeout")
+    argparser.add_argument("--timeout", type=int,
+                           default=1, help="Connection timeout")
     argparser.add_argument("--unit", type=int, default=1, help="Modbus unit")
-    argparser.add_argument("--json", action="store_true", default=False, help="Output as JSON")
+    argparser.add_argument("--json", action="store_true",
+                           default=False, help="Output as JSON")
     args = argparser.parse_args()
 
     meter = sdm_modbus.SDM120(
@@ -26,7 +38,11 @@ if __name__ == "__main__":
     )
 
     if args.json:
-        print(json.dumps(meter.read_all(scaling=True), indent=4))
+        meter_data = json.dumps(meter.read_all(scaling=True), indent=4)
+        print(meter_data)
+        requests.post(url='http://localhost:3333/save-details',
+                      params={"name": 'Room 1', "model": 'SDM120CT', "data": meter_data})
+
     else:
         print(f"{meter}:")
         print("\nInput Registers:")
