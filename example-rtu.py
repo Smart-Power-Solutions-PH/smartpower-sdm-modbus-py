@@ -40,7 +40,7 @@ if __name__ == "__main__":
     if args.json:
         meter_data = json.dumps(meter.read_all(scaling=True), indent=4)
         print(meter_data)
-        requests.post(url='http://localhost:3333/save-details',
+        requests.post(url='http://192.168.254.190:3333/save-details',
                       params={"name": 'Room 1', "model": 'SDM120CT', "data": meter_data})
 
     else:
