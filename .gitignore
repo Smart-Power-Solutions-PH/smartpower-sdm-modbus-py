@@ -102,3 +102,15 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# any logs
+*.log
+
+# sdm configs
+config.json
+
+# vs workspace
+*.code-workspace
+
+# any CSVs
+*.csv

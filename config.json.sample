@@ -1,0 +1,16 @@
+{
+  "devices": [
+    {
+      "type": "SDM120",
+      "slave_id": 1
+    },
+    {
+      "type": "SDM120",
+      "slave_id": 2
+    },
+    {
+      "type": "SDM120",
+      "slave_id": 3
+    }
+  ]
+}

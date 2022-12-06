@@ -1,0 +1,48 @@
+@startuml SDM Interpreter
+actor "Raspberry PI" as rpie
+participant "SDM Script" as sdm_script
+participant "Modbus [RS285]" as modbus
+participant "SDM 120" as sdm120
+participant "SDM 630" as sdm630
+participant "SDM Cloud API" as sdm_cloud_api
+database "RDS" as rds
+
+rpie -> sdm_script: Execute Script
+sdm_script -> sdm_script: Load Config (config.json)
+
+loop infinite loop until stopped
+    loop SDM for [i] meters, max 32
+            alt if [i] meter == SDM 120
+                sdm_script -> modbus: Get power details with params
+                modbus -> sdm120: Connect to power meters (via slave id)
+                modbus <- sdm120: Return details
+                modbus -> sdm_script: Return details
+            end
+            alt else if [i] meter == SDM 630
+                sdm_script -> modbus: Get power details with params
+                modbus -> sdm630: Connect to power meters (via slave id)
+                modbus <- sdm630: Return details
+                modbus -> sdm_script: Return details
+            end
+            sdm_script -> rpie: log <color grey> info </color> or <color red> error </color> in `sdm.log` file
+    end
+alt if No CSV/XSLX found
+    sdm_script -> rpie: Create CSV/XSLX file
+end
+
+sdm_script -> rpie: Save to SD Card (CSV/XSLX)
+sdm_script -> sdm_cloud_api: Call POST v1/save/sdm-details
+alt if request is authenticated
+    sdm_cloud_api -> rds: Save R-Pie SDM Data
+    sdm_script <- sdm_cloud_api: <color green> Return success status </color>
+end
+alt else if not authenticated
+    sdm_script <- sdm_cloud_api: <color red> return error unauthenticated </color>
+end
+
+sdm_cloud_api -> rds: Save logs to DB
+sdm_script -> rpie: log <color grey> info </color> or <color red> error </color> in `sdm.log` file
+sdm_script -> sdm_script: Sleep [i] mins (default 5 mins)
+
+end
+@enduml
