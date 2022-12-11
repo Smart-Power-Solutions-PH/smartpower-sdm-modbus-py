@@ -106,7 +106,7 @@ if __name__ == "__main__":
                 else:
                     logging.info(
                         "Meter Type: %s, ID: %d has sent data" % (meter_type, slave_id))
-                    writer.writerow(json.loads(meter_data))
+                    writer.writerow(meter_data)
 
             else:
                 print("Modbus not detected : ", meter)
