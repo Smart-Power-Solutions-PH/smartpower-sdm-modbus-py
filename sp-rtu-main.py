@@ -35,9 +35,6 @@ if __name__ == "__main__":
     argparser.add_argument("--baud", type=int, default=2400, help="Baud rate")
     argparser.add_argument("--timeout", type=int,
                            default=1, help="Connection timeout")
-    argparser.add_argument("--unit", type=int, default=1, help="Modbus unit")
-    argparser.add_argument("--json", action="store_true",
-                           default=True, help="Output as JSON")
     args = argparser.parse_args()
 
     unli_loop = True
@@ -69,6 +66,7 @@ if __name__ == "__main__":
         for power_meter in power_meters:
             meter = None
             meter_type = power_meter["type"]
+            name = power_meter["name"]
             slave_id = power_meter["slave_id"]
 
             print(meter_type, ' detected',
@@ -100,17 +98,17 @@ if __name__ == "__main__":
 
                 if (meter_data == {} or meter_data is None):
                     logging.info(
-                        "Meter Type: %s, ID: %d is not detected or no data received" % (meter_type, slave_id))
+                        "Meter Type: %s, ID: %d is not detected or no data received" % (meter_type, name, slave_id))
                 else:
                     logging.info(
-                        "Meter Type: %s, ID: %d has sent data" % (meter_type, slave_id))
+                        "Meter Type: %s, Name: %s, ID: %d has sent data" % (meter_type, slave_id))
                     writer.writerow(
                         {"name": power_meter["name"], "sdm_type": power_meter["type"], "datetime": datetime.now(), ** meter_data})
 
             else:
                 print("Modbus not detected : ", meter)
                 logging.error(
-                    "Meter Type: %s, ID: %d can't be connected" % (meter_type, slave_id))
+                    "Meter Type: %s, Name: %s, ID: %d can't be connected" % (meter_type, name, slave_id))
 
             # time.sleep(2)
             # meter_data = json.dumps(meter.read_all(scaling=True), indent=4)
