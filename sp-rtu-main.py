@@ -96,18 +96,24 @@ if __name__ == "__main__":
                 )
 
             if meter.connected():
-                print("SDM Detected! : ", meter)
-                logging.info(
-                    "Meter Type: %s, ID: %d is connected" % (meter_type, slave_id))
+                print("Modbus Detected! : ", meter)
 
                 meter_data = meter.read_all()
-                writer.writerow(json.loads(meter_data))
+
+                if (meter_data == {} or meter_data is None):
+                    logging.info(
+                        "Meter Type: %s, ID: %d is not detected or no data received" % (meter_type, slave_id))
+                else:
+                    logging.info(
+                        "Meter Type: %s, ID: %d has sent data" % (meter_type, slave_id))
+                    writer.writerow(json.loads(meter_data))
 
             else:
-                print("SDM Not Detected! : ", meter)
+                print("Modbus not detected : ", meter)
                 logging.error(
                     "Meter Type: %s, ID: %d can't be connected" % (meter_type, slave_id))
 
-            time.sleep(2)
+            # time.sleep(2)
             # meter_data = json.dumps(meter.read_all(scaling=True), indent=4)
+        print("Sleeping for 10 secs...")
         time.sleep(10)
