@@ -109,6 +109,5 @@ if __name__ == "__main__":
                     "Meter Type: %s, ID: %d can't be connected" % (meter_type, slave_id))
 
             time.sleep(2)
-
             # meter_data = json.dumps(meter.read_all(scaling=True), indent=4)
         time.sleep(10)
