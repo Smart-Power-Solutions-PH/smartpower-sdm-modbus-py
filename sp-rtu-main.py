@@ -101,7 +101,7 @@ if __name__ == "__main__":
                     "Meter Type: %s, ID: %d is connected" % (meter_type, slave_id))
 
                 meter_data = meter.read_all()
-                writer.writerow(json.dumps(meter_data))
+                writer.writerow(meter_data)
 
             else:
                 print("SDM Not Detected! : ", meter)
