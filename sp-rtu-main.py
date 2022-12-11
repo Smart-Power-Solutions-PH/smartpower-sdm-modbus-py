@@ -52,7 +52,7 @@ if __name__ == "__main__":
 
     try:
         config_file = open('config.json')
-        logging.error('Config loaded successfully')
+        logging.info('Config loaded successfully')
     except:
         logging.error('Config not found')
         raise Exception('Config not found! Please create one.')
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     data = json.load(config_file)
     reports_file = open('generated-reports.csv', 'a+', newline='')
 
-    fieldnames = ['voltage', 'current', 'power_active', 'power_apparent', 'power_reactive', 'power_factor', 'phase_angle', 'frequency', 'import_energy_active', 'export_energy_active', 'import_energy_reactive', 'export_energy_reactive', 'total_demand_power_active', 'maximum_total_demand_power_active', 'import_demand_power_active', 'maximum_import_demand_power_active', 'export_demand_power_active', 'maximum_export_demand_power_active', 'total_demand_current', 'maximum_total_demand_current', 'total_energy_active', 'total_energy_reactive'
+    fieldnames = ['name', 'sdm_type', 'voltage', 'current', 'power_active', 'power_apparent', 'power_reactive', 'power_factor', 'phase_angle', 'frequency', 'import_energy_active', 'export_energy_active', 'import_energy_reactive', 'export_energy_reactive', 'total_demand_power_active', 'maximum_total_demand_power_active', 'import_demand_power_active', 'maximum_import_demand_power_active', 'export_demand_power_active', 'maximum_export_demand_power_active', 'total_demand_current', 'maximum_total_demand_current', 'total_energy_active', 'total_energy_reactive'
                   ]
     writer = csv.DictWriter(reports_file, fieldnames=fieldnames)
 
@@ -106,7 +106,8 @@ if __name__ == "__main__":
                 else:
                     logging.info(
                         "Meter Type: %s, ID: %d has sent data" % (meter_type, slave_id))
-                    writer.writerow(meter_data)
+                    writer.writerow(
+                        {"name": power_meter["name"], "sdm_type": power_meter["sdm_type"], **meter_data})
 
             else:
                 print("Modbus not detected : ", meter)
