@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 import csv
 import logging
 import time
@@ -105,7 +105,7 @@ if __name__ == "__main__":
                     logging.info(
                         "Meter Type: %s, ID: %d has sent data" % (meter_type, slave_id))
                     writer.writerow(
-                        {"name": power_meter["name"], "sdm_type": power_meter["type"], "datetime": date.today(), ** meter_data})
+                        {"name": power_meter["name"], "sdm_type": power_meter["type"], "datetime": datetime.now(), ** meter_data})
 
             else:
                 print("Modbus not detected : ", meter)
