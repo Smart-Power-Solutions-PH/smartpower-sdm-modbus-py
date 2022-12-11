@@ -1,13 +1,11 @@
-#!/usr/bin/env python3
-
-import argparse
-import json
-import sdm_modbus
-import requests
-import json
-import time
-import logging
+from datetime import date
 import csv
+import logging
+import time
+import requests
+import sdm_modbus
+import json
+import argparse
 
 
 def printAll(meter):
@@ -60,7 +58,7 @@ if __name__ == "__main__":
     data = json.load(config_file)
     reports_file = open('generated-reports.csv', 'a+', newline='')
 
-    fieldnames = ['name', 'sdm_type', 'voltage', 'current', 'power_active', 'power_apparent', 'power_reactive', 'power_factor', 'phase_angle', 'frequency', 'import_energy_active', 'export_energy_active', 'import_energy_reactive', 'export_energy_reactive', 'total_demand_power_active', 'maximum_total_demand_power_active', 'import_demand_power_active', 'maximum_import_demand_power_active', 'export_demand_power_active', 'maximum_export_demand_power_active', 'total_demand_current', 'maximum_total_demand_current', 'total_energy_active', 'total_energy_reactive'
+    fieldnames = ['name', 'sdm_type', 'datetime', 'voltage', 'current', 'power_active', 'power_apparent', 'power_reactive', 'power_factor', 'phase_angle', 'frequency', 'import_energy_active', 'export_energy_active', 'import_energy_reactive', 'export_energy_reactive', 'total_demand_power_active', 'maximum_total_demand_power_active', 'import_demand_power_active', 'maximum_import_demand_power_active', 'export_demand_power_active', 'maximum_export_demand_power_active', 'total_demand_current', 'maximum_total_demand_current', 'total_energy_active', 'total_energy_reactive'
                   ]
     writer = csv.DictWriter(reports_file, fieldnames=fieldnames)
 
@@ -107,7 +105,7 @@ if __name__ == "__main__":
                     logging.info(
                         "Meter Type: %s, ID: %d has sent data" % (meter_type, slave_id))
                     writer.writerow(
-                        {"name": power_meter["name"], "sdm_type": power_meter["type"], **meter_data})
+                        {"name": power_meter["name"], "sdm_type": power_meter["type"], "date_time": date.today() ** meter_data})
 
             else:
                 print("Modbus not detected : ", meter)
