@@ -107,7 +107,7 @@ if __name__ == "__main__":
                     logging.info(
                         "Meter Type: %s, ID: %d has sent data" % (meter_type, slave_id))
                     writer.writerow(
-                        {"name": power_meter["name"], "sdm_type": power_meter["sdm_type"], **meter_data})
+                        {"name": power_meter["name"], "sdm_type": power_meter["type"], **meter_data})
 
             else:
                 print("Modbus not detected : ", meter)
