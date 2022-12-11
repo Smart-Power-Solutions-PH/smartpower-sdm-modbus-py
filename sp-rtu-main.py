@@ -101,7 +101,7 @@ if __name__ == "__main__":
                         "Meter Type: %s, ID: %d is not detected or no data received" % (meter_type, name, slave_id))
                 else:
                     logging.info(
-                        "Meter Type: %s, Name: %s, ID: %d has sent data" % (meter_type, slave_id))
+                        "Meter Type: %s, Name: %s, ID: %d has sent data" % (meter_type, name, slave_id))
                     writer.writerow(
                         {"name": power_meter["name"], "sdm_type": power_meter["type"], "datetime": datetime.now(), ** meter_data})
 
