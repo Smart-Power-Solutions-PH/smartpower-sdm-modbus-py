@@ -37,14 +37,17 @@ if __name__ == "__main__":
                            default=1, help="Connection timeout")
     args = argparser.parse_args()
 
+    # app configuration
     unli_loop = True
     config_file = None
     reports_file = None
 
+    # initialize logger
     logging.basicConfig(filename="sdm.log",
                         format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
     logging.info('Code executed with %s', (f"{args}"))
 
+    # initialize config
     try:
         config_file = open('config.json')
         logging.info('Config loaded successfully')
@@ -53,14 +56,16 @@ if __name__ == "__main__":
         raise Exception('Config not found! Please create one.')
 
     data = json.load(config_file)
-    reports_file = open('generated-reports.csv', 'a+', newline='')
 
+    # intialize CSV reports
+    reports_file = open('generated-reports.csv', 'a+', newline='')
     fieldnames = ['name', 'sdm_type', 'datetime', 'voltage', 'current', 'power_active', 'power_apparent', 'power_reactive', 'power_factor', 'phase_angle', 'frequency', 'import_energy_active', 'export_energy_active', 'import_energy_reactive', 'export_energy_reactive', 'total_demand_power_active', 'maximum_total_demand_power_active', 'import_demand_power_active', 'maximum_import_demand_power_active', 'export_demand_power_active', 'maximum_export_demand_power_active', 'total_demand_current', 'maximum_total_demand_current', 'total_energy_active', 'total_energy_reactive'
                   ]
     writer = csv.DictWriter(reports_file, fieldnames=fieldnames)
 
     writer.writeheader()
 
+    # main program to get SDM datas
     while (unli_loop == True):
         power_meters = data["devices"]
         for power_meter in power_meters:
@@ -90,6 +95,11 @@ if __name__ == "__main__":
                     timeout=args.timeout,
                     unit=power_meter["slave_id"]
                 )
+            else:
+                print(meter_type, 'is not supported')
+                logging.info(
+                    "Meter Type: %s, Name: %s, ID: %d is not supported" % (meter_type, name, slave_id))
+                continue
 
             if meter.connected():
                 print("Modbus Detected! : ", meter)
