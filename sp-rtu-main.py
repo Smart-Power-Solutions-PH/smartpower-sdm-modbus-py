@@ -1,13 +1,11 @@
-#!/usr/bin/env python3
-
-import argparse
-import json
-import sdm_modbus
-import requests
-import json
-import time
-import logging
+from datetime import datetime
 import csv
+import logging
+import time
+import requests
+import sdm_modbus
+import json
+import argparse
 
 
 def printAll(meter):
@@ -37,40 +35,43 @@ if __name__ == "__main__":
     argparser.add_argument("--baud", type=int, default=2400, help="Baud rate")
     argparser.add_argument("--timeout", type=int,
                            default=1, help="Connection timeout")
-    argparser.add_argument("--unit", type=int, default=1, help="Modbus unit")
-    argparser.add_argument("--json", action="store_true",
-                           default=True, help="Output as JSON")
     args = argparser.parse_args()
 
+    # app configuration
     unli_loop = True
     config_file = None
     reports_file = None
 
+    # initialize logger
     logging.basicConfig(filename="sdm.log",
                         format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
     logging.info('Code executed with %s', (f"{args}"))
 
+    # initialize config
     try:
         config_file = open('config.json')
-        logging.error('Config loaded successfully')
+        logging.info('Config loaded successfully')
     except:
         logging.error('Config not found')
         raise Exception('Config not found! Please create one.')
 
     data = json.load(config_file)
-    reports_file = open('generated-reports.csv', 'a+', newline='')
 
-    fieldnames = ['voltage', 'current', 'power_active', 'power_apparent', 'power_reactive', 'power_factor', 'phase_angle', 'frequency', 'import_energy_active', 'export_energy_active', 'import_energy_reactive', 'export_energy_reactive', 'total_demand_power_active', 'maximum_total_demand_power_active', 'import_demand_power_active', 'maximum_import_demand_power_active', 'export_demand_power_active', 'maximum_export_demand_power_active', 'total_demand_current', 'maximum_total_demand_current', 'total_energy_active', 'total_energy_reactive'
+    # intialize CSV reports
+    reports_file = open('generated-reports.csv', 'a+', newline='')
+    fieldnames = ['name', 'sdm_type', 'datetime', 'voltage', 'current', 'power_active', 'power_apparent', 'power_reactive', 'power_factor', 'phase_angle', 'frequency', 'import_energy_active', 'export_energy_active', 'import_energy_reactive', 'export_energy_reactive', 'total_demand_power_active', 'maximum_total_demand_power_active', 'import_demand_power_active', 'maximum_import_demand_power_active', 'export_demand_power_active', 'maximum_export_demand_power_active', 'total_demand_current', 'maximum_total_demand_current', 'total_energy_active', 'total_energy_reactive'
                   ]
     writer = csv.DictWriter(reports_file, fieldnames=fieldnames)
 
     writer.writeheader()
 
+    # main program to get SDM datas
     while (unli_loop == True):
         power_meters = data["devices"]
         for power_meter in power_meters:
             meter = None
             meter_type = power_meter["type"]
+            name = power_meter["name"]
             slave_id = power_meter["slave_id"]
 
             print(meter_type, ' detected',
@@ -94,21 +95,32 @@ if __name__ == "__main__":
                     timeout=args.timeout,
                     unit=power_meter["slave_id"]
                 )
+            else:
+                print(meter_type, 'is not supported')
+                logging.info(
+                    "Meter Type: %s, Name: %s, ID: %d is not supported" % (meter_type, name, slave_id))
+                continue
 
             if meter.connected():
-                print("SDM Detected! : ", meter)
-                logging.info(
-                    "Meter Type: %s, ID: %d is connected" % (meter_type, slave_id))
+                print("Modbus Detected! : ", meter)
 
                 meter_data = meter.read_all()
-                writer.writerow(json.dumps(meter_data))
+
+                if (meter_data == {} or meter_data is None):
+                    logging.info(
+                        "Meter Type: %s, ID: %d is not detected or no data received" % (meter_type, name, slave_id))
+                else:
+                    logging.info(
+                        "Meter Type: %s, Name: %s, ID: %d has sent data" % (meter_type, name, slave_id))
+                    writer.writerow(
+                        {"name": power_meter["name"], "sdm_type": power_meter["type"], "datetime": datetime.now(), ** meter_data})
 
             else:
-                print("SDM Not Detected! : ", meter)
+                print("Modbus not detected : ", meter)
                 logging.error(
-                    "Meter Type: %s, ID: %d can't be connected" % (meter_type, slave_id))
+                    "Meter Type: %s, Name: %s, ID: %d can't be connected" % (meter_type, name, slave_id))
 
-            time.sleep(2)
-
+            # time.sleep(2)
             # meter_data = json.dumps(meter.read_all(scaling=True), indent=4)
+        print("Sleeping for 10 secs...")
         time.sleep(10)
