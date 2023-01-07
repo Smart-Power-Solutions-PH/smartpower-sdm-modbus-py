@@ -27,7 +27,7 @@ loop infinite loop until stopped
             sdm_script -> rpie: log <color grey> info </color> or <color red> error </color> in `sdm.log` file
     end
 alt if No CSV/XSLX found
-    sdm_script -> rpie: Create CSV/XSLX file
+    sdm_script -> rpie: Create CSV/XSLX file 
 end
 
 sdm_script -> rpie: Save to SD Card (CSV/XSLX)

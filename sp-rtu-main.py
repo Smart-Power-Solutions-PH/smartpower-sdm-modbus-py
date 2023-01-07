@@ -8,7 +8,7 @@ import json
 import argparse
 
 
-def printAll(meter):
+def print_all(meter):
     for k, v in meter.read_all(sdm_modbus.registerType.INPUT).items():
         address, length, rtype, dtype, vtype, label, fmt, batch, sf = meter.registers[k]
 
@@ -20,12 +20,13 @@ def printAll(meter):
             print(f"\t{label}: {v}{fmt}")
 
 
-def sendDataToServer(meter_data):
+def send_data_to_server(meter_data):
     print("\nSending data to server...")
     requests.post(url='http://192.168.254.190:3333/save-details',
                       params={"name": 'Room 1', "model": 'SDM120CT', "data": meter_data})
 
 
+# main
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
     argparser.add_argument("device", type=str, help="Modbus device")
@@ -41,15 +42,19 @@ if __name__ == "__main__":
     unli_loop = True
     config_file = None
     reports_file = None
+    log_file_path = './sdm.log'
+    config_file_path = './config.json'
+    generate_report_file_path = './generated-reports.csv'
+    sleep_secs = 10
 
     # initialize logger
-    logging.basicConfig(filename="sdm.log",
+    logging.basicConfig(filename=log_file_path,
                         format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
     logging.info('Code executed with %s', (f"{args}"))
 
     # initialize config
     try:
-        config_file = open('config.json')
+        config_file = open(config_file_path)
         logging.info('Config loaded successfully')
     except:
         logging.error('Config not found')
@@ -58,7 +63,7 @@ if __name__ == "__main__":
     data = json.load(config_file)
 
     # intialize CSV reports
-    reports_file = open('generated-reports.csv', 'a+', newline='')
+    reports_file = open(generate_report_file_path, 'a+', newline='')
     fieldnames = ['name', 'sdm_type', 'datetime', 'voltage', 'current', 'power_active', 'power_apparent', 'power_reactive', 'power_factor', 'phase_angle', 'frequency', 'import_energy_active', 'export_energy_active', 'import_energy_reactive', 'export_energy_reactive', 'total_demand_power_active', 'maximum_total_demand_power_active', 'import_demand_power_active', 'maximum_import_demand_power_active', 'export_demand_power_active', 'maximum_export_demand_power_active', 'total_demand_current', 'maximum_total_demand_current', 'total_energy_active', 'total_energy_reactive'
                   ]
     writer = csv.DictWriter(reports_file, fieldnames=fieldnames)
@@ -123,4 +128,4 @@ if __name__ == "__main__":
             # time.sleep(2)
             # meter_data = json.dumps(meter.read_all(scaling=True), indent=4)
         print("Sleeping for 10 secs...")
-        time.sleep(10)
+        time.sleep(sleep_secs)
