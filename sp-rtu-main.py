@@ -26,6 +26,10 @@ def send_data_to_server(meter_data):
                       params={"name": 'Room 1', "model": 'SDM120CT', "data": meter_data})
 
 
+def compute_interval(no_of_devices, interval):
+    return interval - (no_of_devices * 2)
+
+
 # main
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
@@ -68,11 +72,25 @@ if __name__ == "__main__":
                   ]
     writer = csv.DictWriter(reports_file, fieldnames=fieldnames)
 
-    writer.writeheader()
+    # open again for checking report count
+    rep_check_file = open(generate_report_file_path, "r+")
+    rep_reader_file = csv.reader(rep_check_file)
+    rep_count = sum(1 for row in rep_reader_file)
+
+    # write header if no rows
+    if rep_count == 0:
+        message_no_header = 'Writing CSV header...'
+        print(message_no_header)
+        logging.info(message_no_header)
+        writer.writeheader()
+    else:
+        message_has_header = 'Has existing header...'
+        print(message_has_header)
+        logging.info(message_has_header)
 
     # main program to get SDM datas
+    power_meters = data["devices"]
     while (unli_loop == True):
-        power_meters = data["devices"]
         for power_meter in power_meters:
             meter = None
             meter_type = power_meter["type"]
@@ -82,7 +100,7 @@ if __name__ == "__main__":
             print(meter_type, ' detected',
                   'Slave ID: ', slave_id)
 
-            if power_meter["type"] == "SDM120":
+            if power_meter["type"].upper() == "SDM120":
                 meter = sdm_modbus.SDM120(
                     device=args.device,
                     stopbits=args.stopbits,
@@ -91,7 +109,7 @@ if __name__ == "__main__":
                     timeout=args.timeout,
                     unit=power_meter["slave_id"]
                 )
-            elif power_meter["type"] == "SDM630":
+            elif power_meter["type"].upper() == "SDM630":
                 meter = sdm_modbus.SDM630(
                     device=args.device,
                     stopbits=args.stopbits,
@@ -106,7 +124,7 @@ if __name__ == "__main__":
                     "Meter Type: %s, Name: %s, ID: %d is not supported" % (meter_type, name, slave_id))
                 continue
 
-            if meter.connected():
+            if meter and meter.connected():
                 print("Modbus Detected! : ", meter)
 
                 meter_data = meter.read_all()
@@ -127,5 +145,6 @@ if __name__ == "__main__":
 
             # time.sleep(2)
             # meter_data = json.dumps(meter.read_all(scaling=True), indent=4)
-        print("Sleeping for 10 secs...")
-        time.sleep(sleep_secs)
+        interval = compute_interval(len(power_meters), sleep_secs)
+        print("Sleeping for %s secs..." % interval)
+        time.sleep(interval)

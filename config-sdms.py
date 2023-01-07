@@ -1,5 +1,6 @@
 import argparse
 import sdm_modbus
+
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
     argparser.add_argument("device", type=str, help="Modbus device")
@@ -22,7 +23,7 @@ if __name__ == "__main__":
     print('Loading SDM...')
     meter = None
 
-    if args.sdmtype == "SDM120":
+    if args.sdmtype.upper() == "SDM120":
         meter = sdm_modbus.SDM120(
             device=args.device,
             stopbits=args.stopbits,
@@ -31,7 +32,7 @@ if __name__ == "__main__":
             timeout=args.timeout,
             unit=args.unit
         )
-    elif args.sdmtype == "SDM630":
+    elif args.sdmtype.upper() == "SDM630":
         meter = sdm_modbus.SDM630(
             device=args.device,
             stopbits=args.stopbits,
@@ -40,13 +41,15 @@ if __name__ == "__main__":
             timeout=args.timeout,
             unit=args.unit
         )
-    else:
-        raise Exception("SDM type is not supported")
+    # else:
+    #     raise Exception("SDM type '%s' is not supported" %
+    #                     args.sdmtype.upper())
 
-    if meter.connected():
+    if meter and meter.connected():
         print('Modbus is detected')
     else:
-        raise Exception("SDM or Modbus is not detected")
+        raise Exception("Modbus or SDM is not detected for '%s' or meter id '%s'" %
+                        (args.sdmtype, args.unit))
 
     match args.paramtype:
         case 'baud':
@@ -54,6 +57,7 @@ if __name__ == "__main__":
         case 'meter_id':
             meter.write("meter_id", args.paramvalue)
         case _:
-            raise Exception("Param type not found. No changes")
+            raise Exception(
+                "Param type '%s' not found. No changes" % args.paramtype)
 
     print('Changes done! End of process')
