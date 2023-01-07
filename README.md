@@ -237,7 +237,11 @@ Contributions are more than welcome, especially testing on supported units, and 
 ## Sample query
 
 Running in Auto
-```python3 sp-rtu-main.py /dev/cu.usbserial-1220```
+```
+python3 sp-rtu-main.py /dev/cu.usbserial-1220
+```
 
-Setting config
-```python3 config-sdms.py /dev/cu.usbserial-1220 --unit 1 --paramtype meter_id --paramvalue 2 --sdmtype SD120```
+Setting SDM Configs
+```
+python3 config-sdms.py /dev/cu.usbserial-1220 --unit 1 --paramtype meter_id --paramvalue 2 --sdmtype SD120
+```
