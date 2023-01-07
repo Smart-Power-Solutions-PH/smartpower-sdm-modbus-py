@@ -233,3 +233,11 @@ If you need more information about a particular register, to look up the units o
 ## Contributing
 
 Contributions are more than welcome, especially testing on supported units, and adding other Eastron SDM units.
+
+## Sample query
+
+Running in Auto
+```python3 sp-rtu-main.py /dev/cu.usbserial-1220```
+
+Setting config
+```python3 config-sdms.py /dev/cu.usbserial-1220 --unit 1 --paramtype meter_id --paramvalue 2 --sdmtype SD120```
