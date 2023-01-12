@@ -131,7 +131,7 @@ if __name__ == "__main__":
 
                 if (meter_data == {} or meter_data is None):
                     logging.info(
-                        "Meter Type: %s, ID: %d is not detected or no data received" % (meter_type, name, slave_id))
+                        "Meter Type: %s, Name: %s, ID: %d is not detected or no data received" % (meter_type, name, slave_id))
                 else:
                     logging.info(
                         "Meter Type: %s, Name: %s, ID: %d has sent data" % (meter_type, name, slave_id))
