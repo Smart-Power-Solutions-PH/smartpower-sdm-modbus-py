@@ -53,9 +53,9 @@ if __name__ == "__main__":
 
     match args.paramtype:
         case 'baud':
-            meter.write("baud", args.paramvalue)
+            meter.write("baud", int(args.paramvalue))
         case 'meter_id':
-            meter.write("meter_id", args.paramvalue)
+            meter.write("meter_id", int(args.paramvalue))
         case _:
             raise Exception(
                 "Param type '%s' not found. No changes" % args.paramtype)
