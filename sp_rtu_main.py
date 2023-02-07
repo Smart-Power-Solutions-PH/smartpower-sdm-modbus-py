@@ -31,6 +31,17 @@ def compute_interval(no_of_devices, interval):
     return interval - (no_of_devices * 2)
 
 
+def load_config_file():
+    config_file_path = './config.json'
+    try:
+        config_file = open(config_file_path)
+        logging.info('Config loaded successfully')
+        return config_file
+    except:
+        logging.error('Config not found')
+        raise Exception('Config not found! Please create one.')
+
+
 # main
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
@@ -47,9 +58,109 @@ if __name__ == "__main__":
     config_file = None
     reports_file = None
     log_file_path = './sdm.log'
-    config_file_path = './config.json'
     generate_report_file_path = './generated-reports.csv'
     sleep_secs = 20
+    sdm_fields = ['voltage',
+                  'current',
+                  'power_active',
+                  'power_apparent',
+                  'power_reactive',
+                  'power_factor',
+                  'phase_angle',
+                  'frequency',
+                  'import_energy_active',
+                  'export_energy_active',
+                  'import_energy_reactive',
+                  'export_energy_reactive',
+                  'total_demand_power_active',
+                  'maximum_total_demand_power_active',
+                  'import_demand_power_active',
+                  'maximum_import_demand_power_active',
+                  'export_demand_power_active',
+                  'maximum_export_demand_power_active',
+                  'total_demand_current',
+                  'maximum_total_demand_current',
+                  'total_energy_active',
+                  'total_energy_reactive',
+                  'l1_voltage',
+                  'l2_voltage',
+                  'l3_voltage',
+                  'l1_current',
+                  'l2_current',
+                  'l3_current',
+                  'l1_power_active',
+                  'l2_power_active',
+                  'l3_power_active',
+                  'l1_power_apparent',
+                  'l2_power_apparent',
+                  'l3_power_apparent',
+                  'l1_power_reactive',
+                  'l2_power_reactive',
+                  'l3_power_reactive',
+                  'l1_power_factor',
+                  'l2_power_factor',
+                  'l3_power_factor',
+                  'l1_phase_angle',
+                  'l2_phase_angle',
+                  'l3_phase_angle',
+                  'voltage_ln',
+                  'current_ln',
+                  'total_line_current',
+                  'total_power_active',
+                  'total_power_apparent',
+                  'total_power_reactive',
+                  'total_power_factor',
+                  'total_phase_angle',
+                  'total_energy_apparent',
+                  'total_current',
+                  'total_import_demand_power_active',
+                  'maximum_import_demand_power_apparent',
+                  'total_demand_power_apparent',
+                  'maximum_demand_power_apparent',
+                  'neutral_demand_current',
+                  'maximum_neutral_demand_current',
+                  'l12_voltage',
+                  'l23_voltage',
+                  'l31_voltage',
+                  'voltage_ll',
+                  'neutral_current',
+                  'l1n_voltage_thd',
+                  'l2n_voltage_thd',
+                  'l3n_voltage_thd',
+                  'l1_current_thd',
+                  'l2_current_thd',
+                  'l3_current_thd',
+                  'voltage_ln_thd',
+                  'current_thd',
+                  'total_pf',
+                  'l1_demand_current',
+                  'l2_demand_current',
+                  'l3_demand_current',
+                  'maximum_l1_demand_current',
+                  'maximum_l2_demand_current',
+                  'maximum_l3_demand_current',
+                  'l12_voltage_thd',
+                  'l23_voltage_thd',
+                  'l31_voltage_thd',
+                  'voltage_ll_thd',
+                  'l1_import_energy_active',
+                  'l2_import_energy_active',
+                  'l3_import_energy_active',
+                  'l1_export_energy_active',
+                  'l2_export_energy_active',
+                  'l3_export_energy_active',
+                  'l1_energy_active',
+                  'l2_energy_active',
+                  'l3_energy_active',
+                  'l1_import_energy_reactive',
+                  'l2_import_energy_reactive',
+                  'l3_import_energy_reactive',
+                  'l1_export_energy_reactive',
+                  'l2_export_energy_reactive',
+                  'l3_export_energy_reactive',
+                  'l1_energy_reactive',
+                  'l2_energy_reactive',
+                  'l3_energy_reactive']
 
     # initialize logger
     logging.basicConfig(filename=log_file_path,
@@ -57,18 +168,14 @@ if __name__ == "__main__":
     logging.info('Code executed with %s', (f"{args}"))
 
     # initialize config
-    try:
-        config_file = open(config_file_path)
-        logging.info('Config loaded successfully')
-    except:
-        logging.error('Config not found')
-        raise Exception('Config not found! Please create one.')
-
+    config_file = load_config_file()
     data = json.load(config_file)
 
     # intialize CSV reports
     reports_file = open(generate_report_file_path, 'a+', newline='')
-    fieldnames = ['name', 'sdm_type', 'datetime', 'voltage', 'current', 'power_active', 'power_apparent', 'power_reactive', 'power_factor', 'phase_angle', 'frequency', 'import_energy_active', 'export_energy_active', 'import_energy_reactive', 'export_energy_reactive', 'total_demand_power_active', 'maximum_total_demand_power_active', 'import_demand_power_active', 'maximum_import_demand_power_active', 'export_demand_power_active', 'maximum_export_demand_power_active', 'total_demand_current', 'maximum_total_demand_current', 'total_energy_active', 'total_energy_reactive'
+    fieldnames = ['name',
+                  'sdm_type',
+                  'datetime', *sdm_fields
                   ]
     writer = csv.DictWriter(reports_file, fieldnames=fieldnames)
 
@@ -137,14 +244,19 @@ if __name__ == "__main__":
                     print(meter_data)
 
                     if bool(meter_data):
-                        filtered_meter_data = {key: meter_data[key] for key in ['voltage', 'current', 'power_active', 'power_apparent', 'power_reactive', 'power_factor', 'phase_angle', 'frequency', 'import_energy_active', 'export_energy_active', 'import_energy_reactive', 'export_energy_reactive', 'total_demand_power_active',
-                                                                                'maximum_total_demand_power_active', 'import_demand_power_active', 'maximum_import_demand_power_active', 'export_demand_power_active', 'maximum_export_demand_power_active', 'total_demand_current', 'maximum_total_demand_current', 'total_energy_active', 'total_energy_reactive']}
+                        # filtered_meter_data = {
+                        #     key: meter_data[key] for key in sdm_fields:
+                        #         try:
+                        #             return True
+                        #     except KeyError:
+                        #     continue
+                        # }
                         message = "[SUCCESS] Meter Type: %s, Name: %s, ID: %d has sent data" % (
                             meter_type, name, slave_id)
                         print(message)
                         logging.info(message)
                         writer.writerow(
-                            {"name": power_meter["name"], "sdm_type": power_meter["type"], "datetime": datetime.now(), **filtered_meter_data})
+                            {"name": power_meter["name"], "sdm_type": power_meter["type"], "datetime": datetime.now(), **meter_data})
                     else:
                         message = "[ERR] Meter Type: %s, Name: %s, ID: %d is not detected or no data received" % (
                             meter_type, name, slave_id)
