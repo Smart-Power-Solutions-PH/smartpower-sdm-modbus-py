@@ -3,23 +3,24 @@
 sdm_modbus is a python library that collects data from Eastron SDM single- and three-phase kWh meters over Modbus RTU or Modbus TCP.
 
 Supported devices:
-* [Eastron SDM72D-M](https://www.eastroneurope.com/products/view/sdm72modbus)
-* [Eastron SDM72D-M v2](https://xn--stromzhler-v5a.eu/media/pdf/93/17/d7/SDM72DM-V2.pdf)
-* [Eastron SDM120-Modbus](https://www.eastroneurope.com/products/view/sdm120modbus)
-* [Eastron SDM230-Modbus](https://www.eastroneurope.com/products/view/sdm230modbus)
-* [Eastron SDM630-Modbus](https://www.eastroneurope.com/products/view/sdm630modbus)
-* [Garo GNM3D-RS485](https://www.garo.se/en/professional/products/installation-products/din-rail-components/energy-meters/energymeter-3p-modbus-rs485)
-* [ESP2866/32 P1 Modbus](https://github.com/nmakel/esp_p1_modbus)
+
+- [Eastron SDM72D-M](https://www.eastroneurope.com/products/view/sdm72modbus)
+- [Eastron SDM72D-M v2](https://xn--stromzhler-v5a.eu/media/pdf/93/17/d7/SDM72DM-V2.pdf)
+- [Eastron SDM120-Modbus](https://www.eastroneurope.com/products/view/sdm120modbus)
+- [Eastron SDM230-Modbus](https://www.eastroneurope.com/products/view/sdm230modbus)
+- [Eastron SDM630-Modbus](https://www.eastroneurope.com/products/view/sdm630modbus)
+- [Garo GNM3D-RS485](https://www.garo.se/en/professional/products/installation-products/din-rail-components/energy-meters/energymeter-3p-modbus-rs485)
+- [ESP2866/32 P1 Modbus](https://github.com/nmakel/esp_p1_modbus)
 
 ## Installation
 
 To install, either clone this project and install using `poetry`:
 
-```poetry install```
+`poetry install`
 
 or install the package from PyPi:
 
-```pip3 install sdm_modbus```
+`pip3 install sdm_modbus`
 
 ## Usage
 
@@ -233,3 +234,17 @@ If you need more information about a particular register, to look up the units o
 ## Contributing
 
 Contributions are more than welcome, especially testing on supported units, and adding other Eastron SDM units.
+
+## Sample query
+
+Running in Auto
+
+```
+python3 sp_rtu_main.py
+```
+
+Setting SDM Configs
+
+```
+python3 config_sdms.py --unit 1 --paramtype meter_id --paramvalue 2 --sdmtype SD120 --baud 2400
+```
