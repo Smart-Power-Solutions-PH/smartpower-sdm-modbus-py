@@ -1,16 +1,17 @@
 {
+  "serial_path": "/dev/cu.usbserial-1230",
   "devices": [
     {
+      "name": "Room 1",
       "type": "SDM120",
-      "slave_id": 1
+      "slave_id": 1,
+      "baud_rate": 2400
     },
     {
-      "type": "SDM120",
-      "slave_id": 2
-    },
-    {
-      "type": "SDM120",
-      "slave_id": 3
+      "name": "Room 6",
+      "type": "SDM630",
+      "slave_id": 6,
+      "baud_rate": 9400
     }
   ]
 }

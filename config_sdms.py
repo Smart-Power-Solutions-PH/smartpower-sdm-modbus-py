@@ -1,8 +1,11 @@
 import argparse
+import json
+
+from sp_rtu_main import load_config_file
 import sdm_modbus
+
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
-    argparser.add_argument("device", type=str, help="Modbus device")
     argparser.add_argument(
         "--paramtype", type=str, help="SDM param to be modified. Ex: baud, meter_id")
     argparser.add_argument(
@@ -19,41 +22,53 @@ if __name__ == "__main__":
                            default=1, help="Connection timeout")
     args = argparser.parse_args()
 
+    # initialize config
+    config_file = load_config_file()
+    data = json.load(config_file)
+
+    serial_path = data["serial_path"] if data.get(
+        "serial_path") else '/dev/ttyUSB0'
+
     print('Loading SDM...')
     meter = None
 
-    if args.sdmtype == "SDM120":
+    if args.sdmtype.upper() == "SDM120":
         meter = sdm_modbus.SDM120(
-            device=args.device,
+            device=serial_path,
             stopbits=args.stopbits,
             parity=args.parity,
             baud=args.baud,
             timeout=args.timeout,
             unit=args.unit
         )
-    elif args.sdmtype == "SDM630":
+    elif args.sdmtype.upper() == "SDM630":
         meter = sdm_modbus.SDM630(
-            device=args.device,
+            device=serial_path,
             stopbits=args.stopbits,
             parity=args.parity,
             baud=args.baud,
             timeout=args.timeout,
             unit=args.unit
         )
-    else:
-        raise Exception("SDM type is not supported")
+    # else:
+    #     raise Exception("SDM type '%s' is not supported" %
+    #                     args.sdmtype.upper())
 
-    if meter.connected():
+    if meter and meter.connected():
         print('Modbus is detected')
     else:
-        raise Exception("SDM or Modbus is not detected")
+        raise Exception("Modbus or SDM is not detected for '%s' or meter id '%s'" %
+                        (args.sdmtype, args.unit))
 
+    result = None
     match args.paramtype:
         case 'baud':
-            meter.write("baud", args.paramvalue)
+            result = meter.write("baud", int(args.paramvalue))
         case 'meter_id':
-            meter.write("meter_id", args.paramvalue)
+            result = meter.write("meter_id", int(args.paramvalue))
         case _:
-            raise Exception("Param type not found. No changes")
+            raise Exception(
+                "Param type '%s' not found. No changes" % args.paramtype)
 
-    print('Changes done! End of process')
+    print('Changes done! End of process' if 'WriteMultipleRegisterResponse' in str(
+        result) else result)
