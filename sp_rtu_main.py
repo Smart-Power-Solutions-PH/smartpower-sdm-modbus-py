@@ -241,8 +241,6 @@ if __name__ == "__main__":
                     filtered_meter_data = {}
                     meter_data = meter.read_all()
 
-                    print(meter_data)
-
                     if bool(meter_data):
                         # filtered_meter_data = {
                         #     key: meter_data[key] for key in sdm_fields:
